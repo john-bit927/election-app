@@ -19,13 +19,8 @@ const pool = mysql.createPool({
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'bincom_test',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  authPlugins: {
-    mysql_clear_password: () => () => Buffer.from(''),
-    caching_sha2_password: () => () => Buffer.from('')
-  }
+  port: process.env.DB_PORT || 3306,
+  // ... rest unchanged
 });
 
 // Test connection
