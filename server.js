@@ -141,7 +141,7 @@ app.get('/lga', (req, res) => {
 
 // Q3: New PU Form
 app.get('/new-pu', (req, res) => {
-    console.log('Received req.body:', req.body);  // Add this line
+    
   const lgaId = req.query.lga_id;
   if (lgaId) {
     pool.query(
