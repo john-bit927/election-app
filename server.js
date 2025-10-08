@@ -2,9 +2,10 @@ const express = require('express');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
 
 // Middleware
 app.set('view engine', 'ejs');
@@ -15,16 +16,16 @@ app.use(express.static('public'));
 
 // MySQL Pool
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '',  // Blank for XAMPP; update if set
-  database: 'bincom_test',
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',  // Blank for XAMPP; update if set
+  database: process.env.DB_NAME || 'bincom_test',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
 
-// Test connection
+// Test connection (commented out for serverless deployment)
 pool.getConnection((err) => {
   if (err) {
     console.error('MySQL Connection Error:', err.message);

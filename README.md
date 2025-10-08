@@ -16,7 +16,10 @@ Full implementation using Express.js + MySQL for election results management.
 Dummy data: Delta State (25), 3 LGAs, 6 wards, 10 PUs, 9 parties.
 
 ## Deployment
-- GitHub repo + Render.com (env vars for DB).
+- GitHub repo + Vercel (env vars for DB).
+- Set up a cloud MySQL DB (e.g., PlanetScale free tier).
+- In Vercel dashboard, add env vars: DB_HOST, DB_USER, DB_PASSWORD, DB_NAME.
+- Deploy from GitHub.
 
 ## Notes
 - Stack: Express.js (experienced level).
