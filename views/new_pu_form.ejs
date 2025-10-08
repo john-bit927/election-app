@@ -4,58 +4,76 @@
   <meta charset="UTF-8">
   <title>New PU Form</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .election-card { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
-    .form-card { background: white; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); padding: 30px; }
-    .party-input { border-left: 4px solid #007bff; margin-bottom: 15px; }
-    .party-input label { font-weight: bold; color: #495057; }
+    body { background: linear-gradient(to right, #ffc107, #fd7e14); min-height: 100vh; }
+    .header { background: linear-gradient(135deg, #00b140, #ce1126); color: white; padding: 1.5rem; border-radius: 15px; margin-bottom: 1rem; box-shadow: 0 4px 8px rgba(0,0,0,0.1); animation: bounceIn 1s ease; }
+    @keyframes bounceIn { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.05); } 70% { transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    .form-label { font-weight: bold; color: #003366; }
+    .btn { border-radius: 25px; }
+    .btn-success { animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); } 100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); } }
+    .party-input { transition: all 0.3s; }
+    .party-input:focus { transform: scale(1.02); box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); }
   </style>
 </head>
-<body class="container mt-4">
-  <div class="election-card p-4 mb-4 text-center">
-    <h2><i class="fas fa-plus-circle me-2"></i>Add New Polling Unit Results</h2>
+<body class="container-fluid p-4">
+  <div class="header text-center">
+    <h2><i class="fas fa-plus-square me-2" style="color: #ffffff;"></i>Question 3: Add New Polling Unit</h2>
   </div>
-  <div class="form-card">
-    <form id="puForm" class="needs-validation" novalidate>
-      <div class="row mb-4">
-        <div class="col-md-6">
-          <label class="form-label"><i class="fas fa-layer-group me-2"></i>LGA (Delta State):</label>
-          <select id="lgaSelect" class="form-select" required onchange="loadWards()">
-            <option value="">Select LGA</option>
-            <% lgas.forEach(lga => { %>
-              <option value="<%= lga.lga_id %>"><%= lga.lga_name %></option>
-            <% }); %>
-          </select>
-          <div class="invalid-feedback">Please select an LGA.</div>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label"><i class="fas fa-building me-2"></i>Ward:</label>
-          <select id="wardSelect" class="form-select" required disabled>
-            <option value="">Select Ward (after LGA)</option>
-          </select>
-          <div class="invalid-feedback">Please select a Ward.</div>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-body">
+          <form id="puForm" class="needs-validation" novalidate>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label"><i class="fas fa-map me-2" style="color: #00b140;"></i>LGA (Delta State):</label>
+                <select id="lgaSelect" class="form-select" required onchange="loadWards()">
+                  <option value="">Select LGA</option>
+                  <% lgas.forEach(lga => { %>
+                    <option value="<%= lga.lga_id %>"><%= lga.lga_name %></option>
+                  <% }); %>
+                </select>
+                <div class="invalid-feedback">Please select an LGA.</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label"><i class="fas fa-building me-2" style="color: #007bff;"></i>Ward:</label>
+                <select id="wardSelect" class="form-select" required disabled>
+                  <option value="">Select Ward (after LGA)</option>
+                </select>
+                <div class="invalid-feedback">Please select a Ward.</div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-sign-in-alt me-2" style="color: #ffc107;"></i>Polling Unit Name:</label>
+              <input type="text" id="puName" class="form-control party-input" required placeholder="e.g., New PU 11">
+              <div class="invalid-feedback">PU name is required.</div>
+            </div>
+            <div class="row">
+              <% parties.forEach(party => { %>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label"><i class="fas fa-ticket-alt me-2" style="color: #dc3545;"></i><%= party %> Score:</label>
+                  <input type="number" name="score_<%= party %>" min="0" class="form-control party-input" required placeholder="0">
+                  <div class="invalid-feedback">Score must be >= 0.</div>
+                </div>
+              <% }); %>
+            </div>
+            <button type="submit" class="btn btn-success w-100 mt-3"><i class="fas fa-save me-1"></i>Save New PU</button>
+          </form>
+          <div id="message" class="mt-3"></div>
         </div>
       </div>
-      <div class="mb-4">
-        <label class="form-label"><i class="fas fa-map-pin me-2"></i>Polling Unit Name:</label>
-        <input type="text" id="puName" class="form-control" required>
-        <div class="invalid-feedback">PU name is required.</div>
-      </div>
-      <% parties.forEach(party => { %>
-        <div class="party-input">
-          <label class="form-label"><i class="fas fa-flag me-2" style="color: <%= party === 'PDP' ? '#e91e63' : party === 'DPP' ? '#9c27b0' : party === 'ACN' ? '#f44336' : party === 'PPA' ? '#ff9800' : party === 'CDC' ? '#4caf50' : party === 'JP' ? '#2196f3' : party === 'CPC' ? '#ffeb3b' : party === 'ANPP' ? '#795548' : '#607d8b' %>"></i><%= party %> Score:</label>
-          <input type="number" name="score_<%= party %>" min="0" class="form-control" required>
-          <div class="invalid-feedback">Score must be >= 0.</div>
-        </div>
-      <% }); %>
-      <button type="submit" class="btn btn-success btn-lg w-100"><i class="fas fa-save me-2"></i>Save New PU</button>
-    </form>
-    <div id="message" class="mt-3"></div>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="/" class="btn btn-secondary btn-lg"><i class="fas fa-home me-1"></i>Home</a>
   </div>
 
   <script>
+    const parties = <%- JSON.stringify(parties) %>;
+
     function loadWards() {
       const lgaId = document.getElementById('lgaSelect').value;
       const wardSelect = document.getElementById('wardSelect');
@@ -93,11 +111,13 @@
       });
       const response = await fetch('/new-pu', { method: 'POST', body: formData });
       const result = await response.json();
-      document.getElementById('message').innerHTML = `<div class="alert alert-${result.success ? 'success' : 'danger'}">${result.message}</div>`;
+      const messageDiv = document.getElementById('message');
+      messageDiv.innerHTML = `<div class="alert alert-${result.success ? 'success' : 'danger'} animate__animated animate__bounceIn">${result.message}</div>`;
+      if (result.success) {
+        // Animation on success
+        messageDiv.querySelector('.alert').style.animation = 'bounceIn 0.5s';
+      }
     });
   </script>
-  <div class="text-center mt-3">
-    <a href="/" class="btn btn-secondary"><i class="fas fa-home me-1"></i>Home</a>
-  </div>
 </body>
 </html>
