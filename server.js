@@ -15,13 +15,17 @@ app.use(express.static('public'));
 
 // MySQL Pool
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '',  // Blank for XAMPP; update if set
-  database: 'bincom_test',
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'bincom_test',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  authPlugins: {
+    mysql_clear_password: () => () => Buffer.from(''),
+    caching_sha2_password: () => () => Buffer.from('')
+  }
 });
 
 // Test connection
