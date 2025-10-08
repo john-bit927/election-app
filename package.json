@@ -1,0 +1,17 @@
+{
+  "name": "election-app",
+  "version": "1.0.0",
+  "description": "Bincom Recruitment Test Solution - Experienced JS Developer",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ejs": "^3.1.9",
+    "mysql2": "^3.6.5",
+    "body-parser": "^1.20.2"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}

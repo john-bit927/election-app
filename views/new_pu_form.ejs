@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>New PU Form</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .election-card { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+    .form-card { background: white; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); padding: 30px; }
+    .party-input { border-left: 4px solid #007bff; margin-bottom: 15px; }
+    .party-input label { font-weight: bold; color: #495057; }
+    /* Override Bootstrap validation red borders */
+    .form-control:invalid {
+      border-color: #ced4da;
+      box-shadow: none;
+    }
+    .form-select:invalid {
+      border-color: #ced4da;
+      box-shadow: none;
+    }
+    .was-validated .form-control:invalid {
+      border-color: #ced4da;
+      box-shadow: none;
+    }
+    .was-validated .form-select:invalid {
+      border-color: #ced4da;
+      box-shadow: none;
+    }
+  </style>
+</head>
+<body class="container mt-4">
+  <div class="election-card p-4 mb-4 text-center">
+    <h2><i class="fas fa-plus-circle me-2"></i>Add New Polling Unit Results</h2>
+  </div>
+  <div class="form-card">
+    <form id="puForm">
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label for="lgaSelect" class="form-label"><i class="fas fa-layer-group me-2"></i>LGA (Delta State):</label>
+          <select id="lgaSelect" class="form-select" onchange="loadWards()">
+            <option value="">Select LGA</option>
+            <% lgas.forEach(lga => { %>
+              <option value="<%= lga.lga_id %>"><%= lga.lga_name %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="wardSelect" class="form-label"><i class="fas fa-building me-2"></i>Ward:</label>
+          <select id="wardSelect" class="form-select" disabled>
+            <option value="">Select Ward (after LGA)</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label for="puName" class="form-label"><i class="fas fa-map-pin me-2"></i>Polling Unit Name:</label>
+        <input type="text" id="puName" class="form-control">
+      </div>
+      <% parties.forEach(party => { %>
+        <div class="party-input">
+          <label for="score_<%= party %>" class="form-label"><i class="fas fa-flag me-2" style="color: <%= party === 'PDP' ? '#e91e63' : party === 'DPP' ? '#9c27b0' : party === 'ACN' ? '#f44336' : party === 'PPA' ? '#ff9800' : party === 'CDC' ? '#4caf50' : party === 'JP' ? '#2196f3' : party === 'CPC' ? '#ffeb3b' : party === 'ANPP' ? '#795548' : '#607d8b' %>"></i><%= party %> Score:</label>
+          <input type="number" id="score_<%= party %>" name="score_<%= party %>" min="0" class="form-control">
+        </div>
+      <% }); %>
+      <button type="submit" class="btn btn-success btn-lg w-100"><i class="fas fa-save me-2"></i>Save New PU</button>
+    </form>
+    <div id="message" class="mt-3"></div>
+  </div>
+
+  <script>
+    // Expose server-passed parties array to client-side JS
+    const parties = <%- JSON.stringify(parties) %>;
+
+    function loadWards() {
+      const lgaId = document.getElementById('lgaSelect').value;
+      const wardSelect = document.getElementById('wardSelect');
+      if (!lgaId) {
+        wardSelect.innerHTML = '<option value="">Select Ward</option>';
+        wardSelect.disabled = true;
+        return;
+      }
+      fetch(`/new-pu?lga_id=${lgaId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) return alert(data.error);
+          wardSelect.innerHTML = '<option value="">Select Ward</option>';
+          data.wards.forEach(ward => {
+            const opt = new Option(ward.ward_name, ward.ward_id);
+            wardSelect.add(opt);
+          });
+          wardSelect.disabled = false;
+        })
+        .catch(err => alert('Error loading wards'));
+    }
+
+    document.getElementById('puForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!e.target.checkValidity()) {
+    e.target.classList.add('was-validated');
+    return;
+  }
+  const formData = new FormData();
+  formData.append('lga_id', document.getElementById('lgaSelect').value);
+  formData.append('ward_id', document.getElementById('wardSelect').value);
+  formData.append('pu_name', document.getElementById('puName').value);
+  parties.forEach(party => {  
+    formData.append(`score_${party}`, document.querySelector(`input[name="score_${party}"]`).value);
+  });
+  
+  // DEBUG: Log the values
+  console.log('FormData Debug:', {
+    lga_id: formData.get('lga_id'),
+    ward_id: formData.get('ward_id'),
+    pu_name: formData.get('pu_name'),
+    // Spot-check one party
+    score_pdp: formData.get('score_PDP')
+  });
+  
+  const response = await fetch('/new-pu', { method: 'POST', body: formData });
+  // ... rest unchanged
+});
+  </script>
+  <div class="text-center mt-3">
+    <a href="/" class="btn btn-secondary"><i class="fas fa-home me-1"></i>Home</a>
+  </div>
+</body>
+</html>
